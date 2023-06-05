@@ -10,10 +10,11 @@ import {
     View
 } from "react-native";
 import {StatusBar} from "expo-status-bar";
-import {useCallback, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {MagnifyingGlassIcon, XMarkIcon} from "react-native-heroicons/outline";
 import {debounce} from "lodash/function";
 import {fetchLocations, fetchWeather, iconMappings} from "../provider/fetchWeatherProvider";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Home() {
 
@@ -34,6 +35,7 @@ export default function Home() {
         setShowCities(false);
         setCities([]);
         setWeather(weather);
+        await AsyncStorage.setItem('weather', JSON.stringify(weather));
     };
 
     const [showSearch, setShowSearch] = useState(true)
@@ -41,6 +43,17 @@ export default function Home() {
     const [cities, setCities] = useState([]);
     const [weather, setWeather] = useState(null);
     const cityHandler = useCallback(debounce(onCityChanges, 1000), []);
+
+    const loadWeather = async () => {
+        const weather = await AsyncStorage.getItem('weather');
+        if (weather !== null) {
+            setWeather(JSON.parse(weather));
+        }
+    };
+
+    useEffect(() => {
+        loadWeather()
+    }, []);
 
     return (
         <View className="flex-1 relative">
