@@ -1,4 +1,14 @@
-import {Image, Platform, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {
+    Image,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
+} from "react-native";
 import {StatusBar} from "expo-status-bar";
 import {useCallback, useState} from "react";
 import {MagnifyingGlassIcon, XMarkIcon} from "react-native-heroicons/outline";
@@ -56,7 +66,8 @@ export default function Home() {
                             className="rounded-full p-3 m-1"
                             style={{backgroundColor: "rgba(255,255,255,0.4)"}}>
                             {
-                                showSearch ? <XMarkIcon size="25" color="white"/> : <MagnifyingGlassIcon size="25" color="white"/>
+                                showSearch ? <XMarkIcon size="25" color="white"/> :
+                                    <MagnifyingGlassIcon size="25" color="white"/>
                             }
                         </TouchableOpacity>
                     </View>
@@ -81,38 +92,59 @@ export default function Home() {
                     }
                 </View>
 
+                {weather && <>
 
-                {/* forecast */}
-                <View className="mx-4 flex justify-around flex-1 mb-2">
-                    <Text className="text-white text-center text-2xl font-bold">
-                        {weather?.location?.name}
-                    </Text>
-                </View>
-                <View className="flex-row justify-center mb-8">
-                    <Image source={iconMappings[weather?.current?.condition?.text || 'other' ]} className="w-60 h-60"/>
-                </View>
-                <View>
-                    <Text className="text-white text-center text-2xl font-bold">
-                        {weather?.current?.condition?.text}
-                    </Text>
-                    <Text className="text-white text-center text-2xl font-bold">
-                        {weather?.current?.temp_c}°
-                    </Text>
-                </View>
-                <View className="flex-row justify-around mx-10 mt-8">
-                    <View className="flex-row space-x-2 items-center">
-                        <Image source={require('../assets/icons/wind.png')} className="w-8 h-8"/>
-                        <Text className="text-white">{weather?.current?.wind_kph} km</Text>
+                    {/* forecast */}
+                    <View className="mx-4 flex justify-around flex-1 mb-2">
+                        <Text className="text-white text-center text-2xl font-bold">
+                            {weather.location.name}
+                        </Text>
                     </View>
-                    <View className="flex-row space-x-2 items-center">
-                        <Image source={require('../assets/icons/drop.png')} className="w-8 h-8"/>
-                        <Text className="text-white">{weather?.current?.humidity}%</Text>
+                    <View className="flex-row justify-center mb-8">
+                        <Image source={iconMappings[weather.current.condition.text || 'other']}
+                               className="w-60 h-60"/>
                     </View>
-                </View>
+                    <View>
+                        <Text className="text-white text-center text-2xl font-bold">
+                            {weather.current.condition.text}
+                        </Text>
+                        <Text className="text-white text-center text-2xl font-bold">
+                            {weather.current.temp_c}°
+                        </Text>
+                    </View>
+                    <View className="flex-row justify-around mx-10 mt-8">
+                        <View className="flex-row space-x-2 items-center">
+                            <Image source={require('../assets/icons/wind.png')} className="w-8 h-8"/>
+                            <Text className="text-white">{weather.current.wind_kph} km</Text>
+                        </View>
+                        <View className="flex-row space-x-2 items-center">
+                            <Image source={require('../assets/icons/drop.png')} className="w-8 h-8"/>
+                            <Text className="text-white">{weather.current.humidity}%</Text>
+                        </View>
+                    </View>
 
-                {/* next days forecast */}
+                    {/* next days forecast */}
+                    <ScrollView horizontal
+                                contentContainerStyle={{paddingHorizontal: 12}}
+                                showsHorizontalScrollIndicator={false}>
+                        {
+                            weather.forecast.forecastday.map((entry, index) => {
+                                const date = new Date(entry.date);
+                                const dayName = date.toLocaleDateString('en', {weekday: "long"})
+                                    .split(',')[0];
+                                return (
+                                    <View key={index}
+                                          className="flex justify-center items-center w-24 py-3 mr-4">
+                                        <Image source={iconMappings[entry.day.condition.text || 'other']} className="w-12 h-12 mb-2"/>
+                                        <Text className="text-white">{entry.day.avgtemp_c}°</Text>
+                                        <Text className="text-white">{dayName}</Text>
+                                    </View>
 
-
+                                )
+                            })
+                        }
+                    </ScrollView>
+                </>}
             </SafeAreaView>
         </View>
     )
